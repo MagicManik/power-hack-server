@@ -7,18 +7,14 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt')
 
 
-
-
 // declare app and port
 const app = express();
 const port = process.env.PORT || 5000;
 
 
-
 // use middleware
 app.use(cors());
 app.use(express.json());
-
 
 
 // connect with mongo database
@@ -130,8 +126,31 @@ async function run() {
 
         // get bills
         app.get('/api/billing-list', async (req, res) => {
-            const bills = await billCollection.find().toArray();
+            console.log('query', req.query)
+            const page = parseInt(req.query.existPage)
+            const size = parseInt(req.query.pageSize)
+
+            const query = {};
+            const cursor = billCollection.find(query);
+
+            let bills;
+            if (page || size) {
+                bills = await cursor.skip(page * size).limit(size).toArray();
+            }
+
+            else {
+                bills = await cursor.toArray();
+            }
+
+
             res.send(bills);
+        });
+
+
+        // to create pagination
+        app.get('/billCount', async (req, res) => {
+            const count = await billCollection.estimatedDocumentCount();
+            res.send({ count })
         })
 
 
