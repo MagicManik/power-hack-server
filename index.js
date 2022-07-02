@@ -5,42 +5,28 @@ require('dotenv').config();
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt')
-
-
-// declare app and port
 const app = express();
 const port = process.env.PORT || 5000;
-
 
 // use middleware
 app.use(cors());
 app.use(express.json());
 
-
 // connect with mongo database
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.eaoeh.mongodb.net/?retryWrites=true&w=majority`;
-
+const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.fe8cp.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
-
 
 // set connection function
 async function run() {
     try {
         await client.connect();
 
-
         // create user collection
         const userCollection = client.db("power_hack").collection("users")
 
         // create bill collection
         const billCollection = client.db("power_hack").collection("bills")
-
-
-
-        /* ========= User Collection API ==============
-        =============================================== */
-
 
         // user registration api
 
@@ -83,7 +69,6 @@ async function run() {
             res.json({ status: 'ok' })
         })
 
-
         // user login api
 
         app.post('/api/login', async (req, res) => {
@@ -102,26 +87,11 @@ async function run() {
                 // token issue
                 const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' });
 
-                // res.send({ result, token });
-
-                /* const token = jwt.sign(
-                    {
-                        id: user._id,
-                        username: user.username
-                    },
-                    JWT_SECRET
-                ) */
-
                 return res.json({ status: 'ok', data: token })
             }
 
             res.json({ status: 'error', error: 'Invalid username/password' })
         })
-
-
-
-        /* ========= Bill Collection API ==============
-        =============================================== */
 
 
         // get bills
@@ -161,7 +131,6 @@ async function run() {
             res.send({ success: true, result });
         });
 
-
         // update billing
 
         app.put('/api/update-billing/:id', async (req, res) => {
@@ -180,7 +149,6 @@ async function run() {
             res.send(result);
         })
 
-
         // delete data : delete a specific bill
         app.delete('/api/delete-billing/:id', async (req, res) => {
             const id = req.params.id;
@@ -189,7 +157,6 @@ async function run() {
             res.send(result);
         })
 
-
     }
 
     finally {
@@ -197,17 +164,13 @@ async function run() {
     }
 }
 
-
 run().catch(console.dir);
-
 
 
 // Make API : check server root
 app.get('/', (req, res) => {
     res.send('Power is Distribuiting Power')
 })
-
-
 
 // listening port
 app.listen(port, () => {
